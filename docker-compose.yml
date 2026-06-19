@@ -1,0 +1,71 @@
+# BLA — full local stack. Service names/ports match ai-context/RUNBOOK.md and
+# the `rerun` skill: db (5432), api (8080), web (4200).
+#
+# Secrets/config come from .env (copy from .env.example; .env is git-ignored).
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # Wait until Postgres accepts connections for the configured role/db.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # .NET 10 Web API (composition root: controllers, OpenAPI + Scalar, JWT, CORS)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      # Double-underscore (__) = nested config keys ASP.NET Core reads.
+      # Connection points at the `db` service on the compose network.
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
+      # Exact SPA origin allowed by CORS (the web service URL on the host).
+      Cors__AllowedOrigin: ${CORS_ALLOWED_ORIGIN}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      # Public, anonymous health endpoint mapped in Program.cs.
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Angular SPA served by nginx (container :80 -> host :4200)
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "4200:80"
+
+volumes:
+  db-data:
