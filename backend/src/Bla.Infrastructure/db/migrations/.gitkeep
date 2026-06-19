@@ -1,0 +1,9 @@
+# SQL migrations
+#
+# Plain *.sql scripts applied on startup by MigrationRunner, in filename order,
+# tracked in the schema_migrations table. Use a sortable numeric prefix, e.g.:
+#   0001_create_users.sql
+#   0002_create_tasks.sql
+#
+# Feature agents own the users/tasks tables. The foundation owns only the runner
+# and the schema_migrations ledger.

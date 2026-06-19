@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Infrastructure: the only project that touches the outside world (Npgsql, hashing, JWT).
+    Depends on Application + Domain.
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bla.Application\Bla.Application.csproj" />
+    <ProjectReference Include="..\Bla.Domain\Bla.Domain.csproj" />
+  </ItemGroup>
+
+  <!-- SQL migration scripts are copied next to the build output so the startup migrator can read them. -->
+  <ItemGroup>
+    <None Include="db\migrations\**\*.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

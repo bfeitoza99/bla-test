@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    Api: the composition root. Depends on Application + Infrastructure.
+    Native OpenAPI + Scalar, JWT auth, CORS, health checks, ProblemDetails.
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Npgsql.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bla.Application\Bla.Application.csproj" />
+    <ProjectReference Include="..\Bla.Infrastructure\Bla.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Domain: zero dependencies (no project references, no NuGet beyond the BCL).
+    Shared compiler settings come from backend/Directory.Build.props.
+  -->
+
+</Project>

@@ -1,0 +1,24 @@
+<Project>
+
+  <!--
+    Shared MSBuild settings for every project under backend/.
+    Keeps per-project .csproj files lean and the compiler contract consistent:
+    nullable on, implicit usings on, warnings treated as errors.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Warnings-as-errors where practical (per CONVENTIONS): build must be warning-clean. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Central package version management lives in Directory.Packages.props. -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

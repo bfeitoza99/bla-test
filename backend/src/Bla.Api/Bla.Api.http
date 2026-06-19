@@ -1,0 +1,12 @@
+@Bla.Api_HostAddress = http://localhost:5130
+
+### Health (public)
+GET {{Bla.Api_HostAddress}}/health
+Accept: application/json
+
+### OpenAPI document (contract)
+GET {{Bla.Api_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+### Scalar API reference UI
+GET {{Bla.Api_HostAddress}}/scalar

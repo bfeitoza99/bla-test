@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Shared test stack + compiler settings come from tests/Directory.Build.props. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bla.Domain\Bla.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
