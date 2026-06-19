@@ -18,6 +18,11 @@ hardened the AI's suggestions.
   With the constraints (Clean Architecture, **no EF/Dapper/Mediator**, TDD, cookie-vs-token
   decisions, OpenAPI/Scalar) encoded once, every later prompt is grounded and the model generates
   *within* the architecture instead of inventing one. This is the core of how I get reliable output.
+- **Orchestration — parallel agents with guardrails.** The implementation is built by multiple
+  sub-agents running in **isolated git worktrees** (a thin foundation first, then feature slices in
+  parallel), governed by two rules that keep AI output trustworthy: **nothing merges without my
+  review of the diff**, and an agent that hits an ambiguous decision **stops and asks rather than
+  guessing**.
 
 ---
 
@@ -229,12 +234,14 @@ Full detail lives in [`ai-context/rules/security.md`](../ai-context/rules/securi
 
 ## Appendix — curated prompt log
 
-Two representative prompts from the session (engineered form):
+Representative prompts from the sessions (engineered form):
 
 | # | Prompt (engineered form)                                                                 | Outcome / decision |
 |---|-------------------------------------------------------------------------------------------|--------------------|
 | 1 | "Set up the AI-context scaffold for this stack: .NET 10 + Postgres/Npgsql + Angular + Scalar + OpenAPI-generated client; add a skill that re-runs only what changed." | `AGENTS.md` + `ai-context/` + `rerun` skill. |
 | 2 | "What OpenAPI version does .NET 10 emit, and will the Angular generator handle it?" | .NET 10 = 3.1 default → pin output to 3.0. |
+| 3 | "Decide the remaining build details and don't guess: validation mechanism, entity↔DTO mapping, task-list semantics, and infra ownership." | FluentValidation · manual mapping · paginated + status-filtered list · infra by agent, no CI. |
+| 4 | "Plan a multi-agent parallel build in isolated worktrees — no merge without my approval; agents stop and ask on ambiguity instead of guessing. Send the plan for approval first." | 3-wave plan: foundation → Auth/Tasks slices in parallel → integration. |
 
 The takeaway the panel should hear: the value wasn't the AI typing code — it was **forcing the AI to
 justify choices against the actual requirements, verifying its factual claims, and right-sizing its

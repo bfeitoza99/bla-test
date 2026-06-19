@@ -54,8 +54,9 @@ the dependency rule and the demo talking point.
 ## The two APIs (per the exercise)
 
 1. **Tasks API** — full CRUD, all endpoints **authorized** (a user only sees/edits their own tasks).
-   - `GET /api/tasks` · `GET /api/tasks/{id}` · `POST /api/tasks` · `PUT /api/tasks/{id}` ·
-     `DELETE /api/tasks/{id}`
+   - `GET /api/tasks?page={n}&pageSize={n}&status={status}` — **paginated**, optional `status`
+     filter; returns `{ items, page, pageSize, total }` · `GET /api/tasks/{id}` ·
+     `POST /api/tasks` · `PUT /api/tasks/{id}` · `DELETE /api/tasks/{id}`
 2. **Users/Auth API** — account + session, with both authorized and non-authorized endpoints.
    - `POST /api/auth/register` (public) · `POST /api/auth/login` (public, returns a JWT in the
      response body) · `GET /api/auth/me` (authorized) · a public health/ping endpoint to

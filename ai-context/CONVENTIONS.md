@@ -13,7 +13,8 @@ contradict the dependency rule in [`ARCHITECTURE.md`](ARCHITECTURE.md).
   `CancellationToken` where it flows naturally. No `.Result` / `.Wait()`.
 - **One type per file**, file named after the type.
 - **DTOs are records**; domain entities are classes with guarded invariants. Never expose domain
-  entities directly over HTTP — map to/from DTOs in the Application layer.
+  entities directly over HTTP — map to/from DTOs in the Application layer. Mapping is
+  **hand-written** (no AutoMapper) — explicit `ToDto`/`ToDomain` methods.
 - **Dependency injection** for everything crossing a layer boundary; constructor injection,
   `readonly` fields. No service locator, no statics for stateful collaborators.
 - **No business logic in controllers.** Controllers validate the request shape, call an Application
@@ -35,7 +36,8 @@ Layer boundaries (which project may reference which) are defined by the dependen
 
 - REST, resource-oriented routes (`/api/tasks`, `/api/auth`). Correct verbs and status codes:
   `200/201/204` success, `400` validation, `401` unauthenticated, `403` forbidden, `404` not found.
-- Validation failures return a consistent problem shape (`ProblemDetails`).
+- Input validation uses **FluentValidation** — one validator per request DTO, executed in the
+  Application layer. Failures surface as `400` with a consistent `ProblemDetails` shape.
 - Every endpoint is annotated so the **OpenAPI document** is accurate (response types, auth
   requirements) — the generated Angular client is only as good as the contract.
 
