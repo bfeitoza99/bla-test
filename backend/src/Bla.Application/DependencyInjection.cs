@@ -1,3 +1,5 @@
+using Bla.Application.Users;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bla.Application;
@@ -15,9 +17,10 @@ public static class DependencyInjection
     /// </summary>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Feature agents: register use-case services and FluentValidation validators here, e.g.
-        //   services.AddScoped<ITaskService, TaskService>();
-        //   services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
+        // Auth slice: use-case service + request validators.
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+
         return services;
     }
 }

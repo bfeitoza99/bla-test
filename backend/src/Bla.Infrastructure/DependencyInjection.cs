@@ -1,4 +1,8 @@
+using Bla.Application.Users;
 using Bla.Infrastructure.Migrations;
+using Bla.Infrastructure.Security;
+using Bla.Infrastructure.Seeding;
+using Bla.Infrastructure.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,11 +43,31 @@ public static class DependencyInjection
         });
         services.AddSingleton<MigrationRunner>();
 
-        // Feature agents: register repositories, password hasher, and JWT token service here, e.g.
-        //   services.AddScoped<ITaskRepository, NpgsqlTaskRepository>();
-        //   services.AddScoped<IUserRepository, NpgsqlUserRepository>();
-        //   services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
-        //   services.AddSingleton<ITokenService, JwtTokenService>();
+        // Auth slice — repositories + security primitives behind their Application ports.
+        services.AddScoped<IUserRepository, NpgsqlUserRepository>();
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+        // JWT issuing options, bound from the shared 'Jwt' section (same values the API validates).
+        services.AddSingleton(sp =>
+        {
+            var options = configuration.GetSection(JwtTokenOptions.SectionName).Get<JwtTokenOptions>()
+                ?? throw new InvalidOperationException(
+                    "Missing required configuration section 'Jwt'.");
+
+            if (string.IsNullOrWhiteSpace(options.SigningKey)
+                || string.IsNullOrWhiteSpace(options.Issuer)
+                || string.IsNullOrWhiteSpace(options.Audience))
+            {
+                throw new InvalidOperationException(
+                    "'Jwt' configuration requires non-empty Issuer, Audience, and SigningKey.");
+            }
+
+            return options;
+        });
+        services.AddSingleton<ITokenService, JwtTokenService>();
+
+        // Idempotent demo-user seeder (invoked on startup after migrations).
+        services.AddScoped<DemoUserSeeder>();
 
         return services;
     }

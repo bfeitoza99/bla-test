@@ -5,6 +5,7 @@ using Bla.Api.Middleware;
 using Bla.Application;
 using Bla.Infrastructure;
 using Bla.Infrastructure.Migrations;
+using Bla.Infrastructure.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -114,6 +115,9 @@ var app = builder.Build();
 // ---------------------------------------------------------------------------
 await ApplyMigrationsAsync(app);
 
+// Seed the demo account (idempotent). Tolerate an unavailable DB at boot, like migrations.
+await SeedDemoUserAsync(app);
+
 // ---------------------------------------------------------------------------
 // HTTP pipeline
 // ---------------------------------------------------------------------------
@@ -154,6 +158,23 @@ static async Task ApplyMigrationsAsync(WebApplication app)
     {
         // Don't crash the host if the DB isn't reachable at boot; the health check will report it.
         logger.LogError(ex, "Database migrations could not be applied at startup; continuing.");
+    }
+}
+
+static async Task SeedDemoUserAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>()
+        .CreateLogger("Startup.Seed");
+    try
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<DemoUserSeeder>();
+        await seeder.SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        // As with migrations: a DB that's unreachable at boot must not crash the host.
+        logger.LogError(ex, "Demo user could not be seeded at startup; continuing.");
     }
 }
 
