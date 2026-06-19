@@ -1,0 +1,31 @@
+# --- .NET ---
+bin/
+obj/
+*.user
+[Bb]uild/
+artifacts/
+.vs/
+
+# --- Node / Angular ---
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+
+# --- Generated OpenAPI client (regenerable from the contract) ---
+frontend/src/app/core/api/generated/
+
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+*.pfx
+
+# --- Local tooling state ---
+.claude/.rerun-state
+
+# --- IDE / OS ---
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
