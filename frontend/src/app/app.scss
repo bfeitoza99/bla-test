@@ -1,0 +1,85 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 0 0 0.5rem 0;
+  z-index: 10;
+
+  &:focus {
+    left: 0;
+  }
+}
+
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+
+  &__inner {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__brand {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--text-strong);
+    text-decoration: none;
+
+    span {
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-left: 0.35rem;
+    }
+  }
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+
+  a,
+  &__button {
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    font: inherit;
+    color: var(--text);
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-muted);
+    }
+
+    &.is-active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+  }
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem;
+}

@@ -1,0 +1,11 @@
+<section class="placeholder-card">
+  <h2 class="placeholder-card__heading">{{ heading() }}</h2>
+
+  @if (description()) {
+    <p class="placeholder-card__description">{{ description() }}</p>
+  }
+
+  <div class="placeholder-card__content">
+    <ng-content />
+  </div>
+</section>

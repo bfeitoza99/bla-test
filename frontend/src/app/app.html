@@ -1,0 +1,24 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<header class="app-header">
+  <div class="app-header__inner">
+    <a class="app-header__brand" routerLink="/">BLA<span>· Tasks</span></a>
+
+    <nav class="app-nav" aria-label="Primary">
+      <a routerLink="/tasks" routerLinkActive="is-active">Tasks</a>
+
+      @if (isAuthenticated()) {
+        <button type="button" class="app-nav__button" (click)="logout()">
+          Sign out
+        </button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="is-active">Sign in</a>
+        <a routerLink="/register" routerLinkActive="is-active">Register</a>
+      }
+    </nav>
+  </div>
+</header>
+
+<main id="main-content" class="app-main">
+  <router-outlet />
+</main>

@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.placeholder-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+
+  &__heading {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    color: var(--text-strong);
+  }
+
+  &__description {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  &__content {
+    color: var(--text);
+  }
+}
