@@ -118,6 +118,9 @@ await ApplyMigrationsAsync(app);
 // Seed the demo account (idempotent). Tolerate an unavailable DB at boot, like migrations.
 await SeedDemoUserAsync(app);
 
+// Seed sample tasks for the demo account (idempotent), after the user exists.
+await SeedDemoTasksAsync(app);
+
 // ---------------------------------------------------------------------------
 // HTTP pipeline
 // ---------------------------------------------------------------------------
@@ -175,6 +178,23 @@ static async Task SeedDemoUserAsync(WebApplication app)
     {
         // As with migrations: a DB that's unreachable at boot must not crash the host.
         logger.LogError(ex, "Demo user could not be seeded at startup; continuing.");
+    }
+}
+
+static async Task SeedDemoTasksAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>()
+        .CreateLogger("Startup.Seed");
+    try
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<DemoTaskSeeder>();
+        await seeder.SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        // As with migrations: a DB that's unreachable at boot must not crash the host.
+        logger.LogError(ex, "Demo tasks could not be seeded at startup; continuing.");
     }
 }
 

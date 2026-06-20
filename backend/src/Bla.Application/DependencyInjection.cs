@@ -1,3 +1,4 @@
+using Bla.Application.Tasks;
 using Bla.Application.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,9 @@ public static class DependencyInjection
         // Auth slice: use-case service + request validators.
         services.AddScoped<IAuthService, AuthService>();
         services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+
+        // Tasks slice: use-case service (validators picked up by the assembly scan above).
+        services.AddScoped<ITaskService, TaskService>();
 
         return services;
     }

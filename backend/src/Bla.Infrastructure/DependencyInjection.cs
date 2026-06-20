@@ -1,7 +1,9 @@
+using Bla.Application.Tasks;
 using Bla.Application.Users;
 using Bla.Infrastructure.Migrations;
 using Bla.Infrastructure.Security;
 using Bla.Infrastructure.Seeding;
+using Bla.Infrastructure.Tasks;
 using Bla.Infrastructure.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +49,9 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, NpgsqlUserRepository>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
+        // Tasks slice — repository behind its Application port.
+        services.AddScoped<ITaskRepository, NpgsqlTaskRepository>();
+
         // JWT issuing options, bound from the shared 'Jwt' section (same values the API validates).
         services.AddSingleton(sp =>
         {
@@ -66,8 +71,9 @@ public static class DependencyInjection
         });
         services.AddSingleton<ITokenService, JwtTokenService>();
 
-        // Idempotent demo-user seeder (invoked on startup after migrations).
+        // Idempotent demo seeders (invoked on startup after migrations; tasks after the user).
         services.AddScoped<DemoUserSeeder>();
+        services.AddScoped<DemoTaskSeeder>();
 
         return services;
     }
