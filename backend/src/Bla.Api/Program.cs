@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Bla.Api.Authentication;
 using Bla.Api.Health;
 using Bla.Api.Middleware;
@@ -99,7 +100,18 @@ builder.Services.AddHealthChecks()
         tags: ["ready"]);
 
 // Controllers are added so feature agents can drop in their endpoints without touching wiring.
-builder.Services.AddControllers();
+// Serialize enums as their string names (e.g. "Todo"/"InProgress"/"Done") in JSON and the
+// OpenAPI schema, so the generated client gets a readable string union, not opaque integers.
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// The OpenAPI document generator reads the HTTP JSON options (not MVC's), so register the same
+// string-enum converter here too — otherwise the schema describes enums as integers and the
+// generated client types `status: number` instead of a string union.
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // ---------------------------------------------------------------------------
 // Application + Infrastructure composition seams (feature agents extend these)
@@ -130,7 +142,12 @@ app.UseExceptionHandler();
 app.MapOpenApi();
 app.MapScalarApiReference();
 
-app.UseHttpsRedirection();
+// HTTPS redirection is opt-in via config. The API runs over plain HTTP in dev and inside the
+// container (TLS is terminated upstream), where an unconditional redirect only logs warnings.
+if (configuration.GetValue("Security:UseHttpsRedirection", false))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors(CorsPolicyName);
 

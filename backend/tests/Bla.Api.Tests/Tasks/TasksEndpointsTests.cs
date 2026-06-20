@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Bla.Application.Common;
 using Bla.Application.Tasks;
 using FluentAssertions;
@@ -18,6 +20,12 @@ public class TasksEndpointsTests : IClassFixture<TasksApiFactory>
 
     public TasksEndpointsTests(TasksApiFactory factory) => _factory = factory;
 
+    // The API serializes enums as strings ("Todo"/"Done"); deserialize responses the same way.
+    private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     private static CreateTaskRequest NewTask(string title = "Sample") =>
         new(title, "A description", TaskStatus.Todo, DateTime.UtcNow.AddDays(3));
 
@@ -30,7 +38,7 @@ public class TasksEndpointsTests : IClassFixture<TasksApiFactory>
         var createResponse = await client.PostAsJsonAsync("/api/tasks", NewTask("First task"));
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         createResponse.Headers.Location.Should().NotBeNull();
-        var created = await createResponse.Content.ReadFromJsonAsync<TaskResponse>();
+        var created = await createResponse.Content.ReadFromJsonAsync<TaskResponse>(JsonOpts);
         created.Should().NotBeNull();
         created!.Title.Should().Be("First task");
         created.Id.Should().NotBe(Guid.Empty);
@@ -38,7 +46,7 @@ public class TasksEndpointsTests : IClassFixture<TasksApiFactory>
         // List -> 200 paginated, with the created task present and the paging shape correct.
         var listResponse = await client.GetAsync("/api/tasks?page=1&pageSize=10");
         listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var page = await listResponse.Content.ReadFromJsonAsync<PagedResult<TaskResponse>>();
+        var page = await listResponse.Content.ReadFromJsonAsync<PagedResult<TaskResponse>>(JsonOpts);
         page.Should().NotBeNull();
         page!.Page.Should().Be(1);
         page.PageSize.Should().Be(10);
@@ -48,14 +56,14 @@ public class TasksEndpointsTests : IClassFixture<TasksApiFactory>
         // Get -> 200 with the same task.
         var getResponse = await client.GetAsync($"/api/tasks/{created.Id}");
         getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var fetched = await getResponse.Content.ReadFromJsonAsync<TaskResponse>();
+        var fetched = await getResponse.Content.ReadFromJsonAsync<TaskResponse>(JsonOpts);
         fetched!.Id.Should().Be(created.Id);
 
         // Update -> 200 with the new state.
         var update = new UpdateTaskRequest("Renamed", "Updated", TaskStatus.Done, DateTime.UtcNow.AddDays(5));
         var updateResponse = await client.PutAsJsonAsync($"/api/tasks/{created.Id}", update);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var updated = await updateResponse.Content.ReadFromJsonAsync<TaskResponse>();
+        var updated = await updateResponse.Content.ReadFromJsonAsync<TaskResponse>(JsonOpts);
         updated!.Title.Should().Be("Renamed");
         updated.Status.Should().Be(TaskStatus.Done);
         updated.UpdatedAt.Should().BeOnOrAfter(created.UpdatedAt);
@@ -77,11 +85,11 @@ public class TasksEndpointsTests : IClassFixture<TasksApiFactory>
             new CreateTaskRequest("Todo one", null, TaskStatus.Todo, DateTime.UtcNow.AddDays(1)));
         var doneResponse = await client.PostAsJsonAsync("/api/tasks",
             new CreateTaskRequest("Done one", null, TaskStatus.Done, DateTime.UtcNow.AddDays(2)));
-        var doneTask = await doneResponse.Content.ReadFromJsonAsync<TaskResponse>();
+        var doneTask = await doneResponse.Content.ReadFromJsonAsync<TaskResponse>(JsonOpts);
 
         var listResponse = await client.GetAsync("/api/tasks?status=Done");
         listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var page = await listResponse.Content.ReadFromJsonAsync<PagedResult<TaskResponse>>();
+        var page = await listResponse.Content.ReadFromJsonAsync<PagedResult<TaskResponse>>(JsonOpts);
 
         page!.Items.Should().OnlyContain(t => t.Status == TaskStatus.Done);
         page.Items.Should().Contain(t => t.Id == doneTask!.Id);
@@ -124,7 +132,7 @@ public class TasksEndpointsTests : IClassFixture<TasksApiFactory>
         // User A creates a task.
         var clientA = _factory.CreateAuthenticatedClient(out _);
         var createResponse = await clientA.PostAsJsonAsync("/api/tasks", NewTask("A's secret"));
-        var created = await createResponse.Content.ReadFromJsonAsync<TaskResponse>();
+        var created = await createResponse.Content.ReadFromJsonAsync<TaskResponse>(JsonOpts);
 
         // User B must not be able to see it — 404, not 403, so existence isn't leaked.
         var clientB = _factory.CreateAuthenticatedClient(out _);
