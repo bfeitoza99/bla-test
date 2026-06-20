@@ -40,6 +40,25 @@ Just the database (for local backend dev):
 docker compose up -d db
 ```
 
+### Troubleshooting: `docker compose build` fails pulling from MCR (`EOF`)
+
+On a healthy Docker, `docker compose up --build` works as-is. But some Docker Desktop installs
+(WSL2 backend) fail to pull `mcr.microsoft.com/dotnet/*` base images through the daemon with
+`failed to do request: Head ".../manifests/...": EOF`, while Docker Hub images pull fine and the
+host/containers can reach MCR directly. This is a Docker-daemon pull-path issue, not the project.
+
+Workaround — build the images with a **container-driver BuildKit builder** (pulls base images over
+the working container network), then start with `--no-build`:
+
+```powershell
+docker buildx create --name mcrfix --driver docker-container --use
+docker buildx build --builder mcrfix --load -t bla-test-api -f backend/Dockerfile backend
+docker buildx build --builder mcrfix --load -t bla-test-web -f frontend/Dockerfile frontend
+docker compose up -d --no-build
+```
+
+(`bla-test-api` / `bla-test-web` are the image names `docker compose config --images` expects.)
+
 ## Backend — local dev
 
 ```powershell
