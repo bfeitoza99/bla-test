@@ -1,6 +1,132 @@
-<app-page-placeholder
-  heading="My tasks"
-  description="Placeholder task list. The paginated, status-filterable task list (with create, edit, and delete) will be wired to the generated tasks client in a later wave."
->
-  <p>No tasks to show yet.</p>
-</app-page-placeholder>
+<section class="tasks">
+  <header class="tasks__header">
+    <div>
+      <h1 class="tasks__title">My tasks</h1>
+      <p class="tasks__subtitle">Create, track, and update your work.</p>
+    </div>
+    <button type="button" class="btn btn--primary" (click)="startCreate()">New task</button>
+  </header>
+
+  <div class="tasks__toolbar">
+    <label class="filter">
+      <span class="filter__label">Status</span>
+      <select
+        class="filter__select"
+        [value]="statusFilter()"
+        (change)="onFilterChange($any($event.target).value)"
+      >
+        <option value="All">All</option>
+        @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (error(); as message) {
+    <p class="tasks__error" role="alert">{{ message }}</p>
+  }
+
+  @if (loading()) {
+    <p class="tasks__state" role="status">Loading tasks…</p>
+  } @else if (isEmpty()) {
+    <div class="tasks__empty">
+      <p>No tasks yet.</p>
+      <button type="button" class="btn btn--primary" (click)="startCreate()">
+        Create your first task
+      </button>
+    </div>
+  } @else {
+    <ul class="task-cards">
+      @for (task of tasks(); track task.id) {
+        <li class="task-card">
+          <div class="task-card__main">
+            <div class="task-card__heading">
+              <h2 class="task-card__title">{{ task.title }}</h2>
+              <span class="badge badge--{{ statusModifier(task.status) }}">
+                {{ statusLabel(task.status) }}
+              </span>
+            </div>
+            @if (task.description) {
+              <p class="task-card__description">{{ task.description }}</p>
+            }
+            <p class="task-card__due">Due {{ task.dueDate | date: 'mediumDate' }}</p>
+          </div>
+          <div class="task-card__actions">
+            <button type="button" class="btn btn--ghost" (click)="startEdit(task)">Edit</button>
+            <button type="button" class="btn btn--danger" (click)="requestDelete(task)">
+              Delete
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+
+    <nav class="pager" aria-label="Pagination">
+      <button
+        type="button"
+        class="btn btn--ghost"
+        (click)="goToPage(page() - 1)"
+        [disabled]="page() <= 1"
+      >
+        Previous
+      </button>
+      <span class="pager__status">
+        {{ rangeStart() }}–{{ rangeEnd() }} of {{ total() }} · Page {{ page() }} of
+        {{ totalPages() }}
+      </span>
+      <button
+        type="button"
+        class="btn btn--ghost"
+        (click)="goToPage(page() + 1)"
+        [disabled]="page() >= totalPages()"
+      >
+        Next
+      </button>
+    </nav>
+  }
+</section>
+
+@if (editor().mode !== 'closed') {
+  <div class="modal-backdrop">
+    <button
+      type="button"
+      class="modal-backdrop__dismiss"
+      aria-label="Close task editor"
+      (click)="closeEditor()"
+    ></button>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Task editor">
+      <app-task-form
+        [task]="editorTask"
+        [saving]="saving()"
+        (saveTask)="saveTask($event)"
+        (cancelEdit)="closeEditor()"
+      />
+    </div>
+  </div>
+}
+
+@if (pendingDelete(); as task) {
+  <div class="modal-backdrop">
+    <button
+      type="button"
+      class="modal-backdrop__dismiss"
+      aria-label="Cancel delete"
+      (click)="cancelDelete()"
+    ></button>
+    <div class="modal modal--confirm" role="alertdialog" aria-modal="true" aria-label="Confirm delete">
+      <h2 class="modal__title">Delete task?</h2>
+      <p class="modal__body">
+        “{{ task.title }}” will be permanently removed. This cannot be undone.
+      </p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost" (click)="cancelDelete()" [disabled]="deleting()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn--danger" (click)="confirmDelete()" [disabled]="deleting()">
+          {{ deleting() ? 'Deleting…' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,31 +1,22 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 
-/**
- * Stub credentials shapes. These mirror the intended `/api/auth` request bodies
- * (see ai-context/ARCHITECTURE.md). Once the OpenAPI client is generated, the
- * real request/response models live in `core/api/generated/` and these local
- * shapes should be replaced by the generated DTOs.
- */
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterCredentials {
-  email: string;
-  password: string;
-}
+import {
+  AuthResponse,
+  AuthService as GeneratedAuthService,
+  LoginRequest,
+  RegisterRequest,
+  UserResponse,
+} from '../api/generated';
 
 const TOKEN_STORAGE_KEY = 'bla.auth.token';
 
 /**
  * Application auth service.
  *
- * SKELETON ONLY: this is a stub. It owns the single source of truth for the JWT
- * (kept in `localStorage`, per ai-context/rules/security.md) and exposes
- * `login`/`register`/`logout`/`token`. The HTTP calls are intentionally NOT
- * implemented yet — the backend is not running and the auth endpoints are
- * consumed through the generated OpenAPI client in a later wave.
+ * Owns the single source of truth for the JWT (kept in `localStorage`, per
+ * ai-context/rules/security.md) and wraps the generated OpenAPI `AuthService`
+ * for `login` / `register` / `me`.
  *
  * Known tradeoff (documented in security.md): a token in `localStorage` is
  * readable by JS and exposed to XSS, and a single ~1h token cannot be revoked
@@ -33,6 +24,8 @@ const TOKEN_STORAGE_KEY = 'bla.auth.token';
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly api = inject(GeneratedAuthService);
+
   /** Reactive token state so guards/components can react to sign-in changes. */
   private readonly tokenSignal = signal<string | null>(this.readToken());
 
@@ -45,25 +38,29 @@ export class AuthService {
   }
 
   /**
-   * TODO(api-wave): wire to the generated AuthService
-   * (`POST /api/auth/login`). Should call the generated client, then
-   * `setToken(response.token)`. Returns a Promise/Observable in the real impl.
+   * Authenticates against `POST /api/auth/login`. On success the returned JWT is
+   * persisted and reactive state updates. Errors propagate for the caller to
+   * surface (e.g. 401 invalid credentials).
    */
-  login(_credentials: LoginCredentials): void {
-    throw new Error(
-      'AuthService.login is a stub — wire it to the generated OpenAPI client (POST /api/auth/login).',
-    );
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.api
+      .apiAuthLoginPost(credentials)
+      .pipe(tap((response) => this.setToken(response.token)));
   }
 
   /**
-   * TODO(api-wave): wire to the generated AuthService
-   * (`POST /api/auth/register`). On success, log the user in (or redirect to
-   * login) per the chosen UX.
+   * Creates an account via `POST /api/auth/register`. The API returns a token on
+   * success, so we sign the user straight in.
    */
-  register(_credentials: RegisterCredentials): void {
-    throw new Error(
-      'AuthService.register is a stub — wire it to the generated OpenAPI client (POST /api/auth/register).',
-    );
+  register(credentials: RegisterRequest): Observable<AuthResponse> {
+    return this.api
+      .apiAuthRegisterPost(credentials)
+      .pipe(tap((response) => this.setToken(response.token)));
+  }
+
+  /** Fetches the current user via `GET /api/auth/me` (authorized). */
+  me(): Observable<UserResponse> {
+    return this.api.apiAuthMeGet();
   }
 
   /** Clears the token. Navigation back to /login is handled by the caller. */

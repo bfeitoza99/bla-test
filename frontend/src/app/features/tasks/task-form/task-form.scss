@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.task-form {
+  &__title {
+    margin: 0 0 1.25rem;
+    font-size: 1.25rem;
+    color: var(--text-strong);
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 30rem) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+
+  label {
+    font-weight: 600;
+    color: var(--text-strong);
+    font-size: 0.95rem;
+
+    .optional {
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.7rem;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    &.is-invalid {
+      border-color: #c8362f;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 4.5rem;
+  }
+}
+
+.field-error {
+  color: #c8362f;
+  font-size: 0.85rem;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.55rem 1rem;
+
+  &--primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

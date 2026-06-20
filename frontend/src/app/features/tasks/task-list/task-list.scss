@@ -1,3 +1,265 @@
 :host {
   display: block;
 }
+
+.tasks {
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-strong);
+  }
+
+  &__subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--text-muted);
+  }
+
+  &__toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__error {
+    margin: 0 0 1rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: 0.5rem;
+    background: rgb(200 54 47 / 12%);
+    border: 1px solid rgb(200 54 47 / 35%);
+    color: #c8362f;
+  }
+
+  &__state {
+    color: var(--text-muted);
+    padding: 1.5rem 0;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 0.75rem;
+    color: var(--text-muted);
+
+    p {
+      margin: 0 0 1rem;
+    }
+  }
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &__label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  &__select {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.7rem;
+    min-width: 11rem;
+  }
+}
+
+.task-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+
+  &__main {
+    flex: 1 1 18rem;
+    min-width: 0;
+  }
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-strong);
+    overflow-wrap: anywhere;
+  }
+
+  &__description {
+    margin: 0.5rem 0 0;
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+
+  &__due {
+    margin: 0.5rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+
+  &--todo {
+    background: rgb(91 98 107 / 15%);
+    color: var(--text-muted);
+    border-color: rgb(91 98 107 / 30%);
+  }
+
+  &--in-progress {
+    background: rgb(47 111 237 / 14%);
+    color: var(--accent);
+    border-color: rgb(47 111 237 / 35%);
+  }
+
+  &--done {
+    background: rgb(34 139 87 / 15%);
+    color: #1f8a52;
+    border-color: rgb(34 139 87 / 35%);
+  }
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+
+  &__status {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.95rem;
+
+  &--primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  &--danger {
+    background: transparent;
+    border-color: rgb(200 54 47 / 50%);
+    color: #c8362f;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+
+  &__dismiss {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    background: rgb(0 0 0 / 45%);
+    cursor: pointer;
+  }
+}
+
+.modal {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 32rem;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 25%);
+
+  &--confirm {
+    max-width: 26rem;
+  }
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    color: var(--text-strong);
+  }
+
+  &__body {
+    margin: 0 0 1.25rem;
+    color: var(--text);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+}

@@ -1,0 +1,64 @@
+<form class="task-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <h2 class="task-form__title">{{ isEdit ? 'Edit task' : 'New task' }}</h2>
+
+  <div class="form-field">
+    <label for="task-title">Title</label>
+    <input
+      id="task-title"
+      type="text"
+      formControlName="title"
+      [class.is-invalid]="form.controls.title.touched && form.controls.title.invalid"
+      [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid"
+      aria-describedby="task-title-error"
+    />
+    @if (form.controls.title.touched && form.controls.title.invalid) {
+      <span class="field-error" id="task-title-error">
+        @if (form.controls.title.errors?.['required']) {
+          Title is required.
+        } @else {
+          Title must be 200 characters or fewer.
+        }
+      </span>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="task-description">Description <span class="optional">(optional)</span></label>
+    <textarea id="task-description" formControlName="description" rows="3"></textarea>
+  </div>
+
+  <div class="task-form__row">
+    <div class="form-field">
+      <label for="task-status">Status</label>
+      <select id="task-status" formControlName="status">
+        @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="task-due">Due date</label>
+      <input
+        id="task-due"
+        type="date"
+        formControlName="dueDate"
+        [class.is-invalid]="form.controls.dueDate.touched && form.controls.dueDate.invalid"
+        [attr.aria-invalid]="form.controls.dueDate.touched && form.controls.dueDate.invalid"
+        aria-describedby="task-due-error"
+      />
+      @if (form.controls.dueDate.touched && form.controls.dueDate.invalid) {
+        <span class="field-error" id="task-due-error">Due date is required.</span>
+      }
+    </div>
+  </div>
+
+  <div class="task-form__actions">
+    <button type="button" class="btn btn--ghost" (click)="cancelEdit.emit()" [disabled]="saving()">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn--primary" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : isEdit ? 'Save changes' : 'Create task' }}
+    </button>
+  </div>
+</form>

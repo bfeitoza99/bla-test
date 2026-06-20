@@ -3,8 +3,8 @@
 How to build, run, test, migrate, seed, and regenerate the OpenAPI client. Commands assume Windows
 + PowerShell (the dev machine) and Docker Desktop.
 
-> Status: the solution is being scaffolded. Sections marked _(planned)_ describe the intended
-> commands; they become live as the code lands. Keep this file in sync as things are wired up.
+> Status: backend (auth + tasks), frontend, and Docker infra are implemented. Keep this file in
+> sync as things change.
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ Just the database (for local backend dev):
 docker compose up -d db
 ```
 
-## Backend — local dev _(planned)_
+## Backend — local dev
 
 ```powershell
 # from backend/
@@ -52,7 +52,7 @@ dotnet run --project src/Bla.Api      # serves API + Scalar + OpenAPI
 Connection string comes from configuration/env (`ConnectionStrings__Default`), pointing at the
 compose `db`. Never commit real secrets — use `.env` (git-ignored) from `.env.example`.
 
-## Database — migrations & seed _(planned)_
+## Database — migrations & seed
 
 - Schema lives as plain SQL under `backend/src/Bla.Infrastructure/db/migrations/*.sql`.
 - A lightweight migrator runs pending scripts on API startup (idempotent, tracked in a
@@ -87,11 +87,13 @@ DTO changes.
 npm run generate:api
 ```
 
-`generate:api` (defined in `frontend/package.json`) runs openapi-generator with the
-`typescript-angular` generator against `http://localhost:8080/openapi/v1.json`, writing to
-`src/app/core/api/generated/` (git-ignored). _(Script to be added during frontend scaffolding.)_
+`generate:api` (`frontend/scripts/generate-api.mjs`) fetches `http://localhost:8080/openapi/v1.json`
+and runs the **openapi-generator Docker image** (`typescript-angular`) — so **no local Java/JDK is
+needed, only Docker**. Output goes to `src/app/core/api/generated/`, which **is committed** (so a
+clean clone and the `web` Docker build work without a generation step); it's generated, so never
+hand-edit it — change the API contract and regenerate.
 
-## Frontend — local dev _(planned)_
+## Frontend — local dev
 
 ```powershell
 # from frontend/

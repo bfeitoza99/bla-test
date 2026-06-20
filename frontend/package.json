@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "generate:api": "openapi-generator-cli generate -i http://localhost:8080/openapi/v1.json -g typescript-angular -o src/app/core/api/generated --additional-properties=ngVersion=22.0.0,providedInRoot=true,withInterfaces=true"
+    "generate:api": "node scripts/generate-api.mjs"
   },
   "private": true,
   "packageManager": "npm@10.9.2",
@@ -27,7 +27,6 @@
     "@angular/cli": "^22.0.3",
     "@angular/compiler-cli": "^22.0.0",
     "@eslint/js": "^10.0.1",
-    "@openapitools/openapi-generator-cli": "^2.25.4",
     "angular-eslint": "22.0.0",
     "eslint": "^10.3.0",
     "jsdom": "^28.0.0",

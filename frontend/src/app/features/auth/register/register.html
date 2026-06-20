@@ -1,9 +1,68 @@
-<app-page-placeholder
-  heading="Create account"
-  description="Placeholder registration page. The reactive sign-up form will be wired to the generated auth client in a later wave."
->
-  <p>
-    Already have an account?
-    <a routerLink="/login">Sign in</a>
-  </p>
-</app-page-placeholder>
+<div class="auth">
+  <div class="auth__card">
+    <h1 class="auth__heading">Create account</h1>
+    <p class="auth__subhead">Set up an account to start tracking your tasks.</p>
+
+    @if (serverError(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-field">
+        <label for="register-email">Email</label>
+        <input
+          id="register-email"
+          type="email"
+          autocomplete="email"
+          formControlName="email"
+          [class.is-invalid]="form.controls.email.touched && form.controls.email.invalid"
+          [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
+          aria-describedby="register-email-error"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error" id="register-email-error">
+            @if (form.controls.email.errors?.['required']) {
+              Email is required.
+            } @else {
+              Enter a valid email address.
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="register-password">Password</label>
+        <input
+          id="register-password"
+          type="password"
+          autocomplete="new-password"
+          formControlName="password"
+          [class.is-invalid]="form.controls.password.touched && form.controls.password.invalid"
+          [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid"
+          aria-describedby="register-password-hint register-password-error"
+        />
+        <span class="field-hint" id="register-password-hint">
+          At least 8 characters, with an uppercase letter, a lowercase letter, and a number.
+        </span>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error" id="register-password-error">
+            @if (form.controls.password.errors?.['required']) {
+              Password is required.
+            } @else {
+              Password needs {{ passwordRequirements().join(', ') }}.
+            }
+          </span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+        {{ submitting() ? 'Creating account…' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="auth__footer">
+      Already have an account?
+      <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>

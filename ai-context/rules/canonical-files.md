@@ -15,7 +15,10 @@ copy — change the canonical source and let everything else derive from it.
 ## Rules
 
 - **Generated code is read-only.** If the generated Angular client is wrong, fix the **contract**
-  (API annotations/DTOs) and regenerate — never edit files under `core/api/generated/`.
+  (API annotations/DTOs) and regenerate — never edit files under `core/api/generated/`. The client
+  **is committed** (so a clean clone and the `web` Docker build work without a generation step), but
+  it is still generated: regenerate with `npm run generate:api` (runs openapi-generator via Docker,
+  no local Java needed), don't hand-edit.
 - **Bridge files stay thin.** `CLAUDE.md` (and any future `GEMINI.md`, `.cursorrules`, etc.) only
   redirect to `AGENTS.md`. No rules live in them.
 - **Schema changes go through migrations**, never ad-hoc `ALTER`s on a running DB.

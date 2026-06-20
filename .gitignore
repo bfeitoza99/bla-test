@@ -12,8 +12,8 @@ dist/
 .angular/
 npm-debug.log*
 
-# --- Generated OpenAPI client (regenerable from the contract) ---
-frontend/src/app/core/api/generated/
+# --- OpenAPI spec snapshot fetched during client generation ---
+frontend/openapi.json
 
 # --- Environment / secrets ---
 .env

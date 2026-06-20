@@ -1,9 +1,59 @@
-<app-page-placeholder
-  heading="Sign in"
-  description="Placeholder login page. The reactive sign-in form will be wired to the generated auth client in a later wave."
->
-  <p>
-    Need an account?
-    <a routerLink="/register">Create one</a>
-  </p>
-</app-page-placeholder>
+<div class="auth">
+  <div class="auth__card">
+    <h1 class="auth__heading">Sign in</h1>
+    <p class="auth__subhead">Welcome back. Sign in to manage your tasks.</p>
+
+    @if (serverError(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="form-field">
+        <label for="login-email">Email</label>
+        <input
+          id="login-email"
+          type="email"
+          autocomplete="email"
+          formControlName="email"
+          [class.is-invalid]="form.controls.email.touched && form.controls.email.invalid"
+          [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
+          aria-describedby="login-email-error"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error" id="login-email-error">
+            @if (form.controls.email.errors?.['required']) {
+              Email is required.
+            } @else {
+              Enter a valid email address.
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="login-password">Password</label>
+        <input
+          id="login-password"
+          type="password"
+          autocomplete="current-password"
+          formControlName="password"
+          [class.is-invalid]="form.controls.password.touched && form.controls.password.invalid"
+          [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid"
+          aria-describedby="login-password-error"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error" id="login-password-error">Password is required.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn--primary" [disabled]="submitting()">
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="auth__footer">
+      Need an account?
+      <a routerLink="/register">Create one</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+:host {
+  display: block;
+}
+
+.auth {
+  max-width: 26rem;
+  margin: 2rem auto;
+
+  &__card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+  }
+
+  &__heading {
+    margin: 0 0 0.25rem;
+    font-size: 1.4rem;
+    color: var(--text-strong);
+  }
+
+  &__subhead {
+    margin: 0 0 1.5rem;
+    color: var(--text-muted);
+  }
+
+  &__footer {
+    margin: 1.25rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+
+  label {
+    font-weight: 600;
+    color: var(--text-strong);
+    font-size: 0.95rem;
+  }
+
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.7rem;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    &.is-invalid {
+      border-color: #c8362f;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 4.5rem;
+  }
+}
+
+.field-error {
+  color: #c8362f;
+  font-size: 0.85rem;
+}
+
+.field-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.form-error {
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.5rem;
+  background: rgb(200 54 47 / 12%);
+  border: 1px solid rgb(200 54 47 / 35%);
+  color: #c8362f;
+  font-size: 0.9rem;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+
+  &--primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
